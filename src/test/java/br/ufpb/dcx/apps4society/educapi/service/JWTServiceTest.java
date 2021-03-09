@@ -1,6 +1,8 @@
 package br.ufpb.dcx.apps4society.educapi.service;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
+import br.ufpb.dcx.apps4society.educapi.domain.builder.UserBuilder;
+import br.ufpb.dcx.apps4society.educapi.domain.builder.UserLoginDTOBuilder;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserLoginDTO;
 import br.ufpb.dcx.apps4society.educapi.repositories.UserRepository;
 import br.ufpb.dcx.apps4society.educapi.response.LoginResponse;
@@ -22,8 +24,8 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class JWTServiceTest {
 
-    private final UserLoginDTO userLoginDTO = new UserLoginDTO("email", "password");
-    private final Optional<User> userOptional = Optional.ofNullable(new User("name", "email", "password"));
+    private final UserLoginDTO userLoginDTO = UserLoginDTOBuilder.getInstance().build();
+    private final Optional<User> userOptional = Optional.ofNullable(UserBuilder.getInstance().build());
 
     @Mock
     UserRepository userRepository;
