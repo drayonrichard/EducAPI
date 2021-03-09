@@ -68,7 +68,7 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void revocerUserWithMalformedToken() {
+    public void revocerUserWithMalformedTokenTest() {
         Assertions.assertThrows(MalformedJwtException.class, () -> {
             this.service.recoverUser("Bearer invalid token");
         });
