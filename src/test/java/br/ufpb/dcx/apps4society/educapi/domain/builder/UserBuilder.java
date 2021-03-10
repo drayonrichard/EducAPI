@@ -1,6 +1,10 @@
 package br.ufpb.dcx.apps4society.educapi.domain.builder;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
+import br.ufpb.dcx.apps4society.educapi.dto.user.UserLoginDTO;
+import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
+
+import java.util.Optional;
 
 public class UserBuilder {
 
@@ -9,32 +13,40 @@ public class UserBuilder {
     private String email = "user@educapi.com";
     private String password = "testpassword";
 
-    public static UserBuilder getInstance() {
+    public static UserBuilder anUser() {
         return new UserBuilder();
     }
 
-    public UserBuilder id(Long id) {
+    public UserBuilder withId(Long id) {
         this.id = id;
         return this;
     }
 
-    public UserBuilder email(String email) {
+    public UserBuilder withEmail(String email) {
         this.email = email;
         return this;
     }
 
-    public UserBuilder name(String name) {
+    public UserBuilder withName(String name) {
         this.name = name;
         return this;
     }
 
-    public UserBuilder password(String password){
+    public UserBuilder withPassword(String password){
         this.password = password;
         return this;
     }
 
-    public User build() {
-        return new User(this.id, this.name, this.email, this.password);
+    public Optional<User> buildOptionalUser() {
+        return Optional.ofNullable(new User(this.id, this.name, this.email, this.password));
+    }
+
+    public UserRegisterDTO buildUserRegisterDTO() {
+        return new UserRegisterDTO(this.name, this.email, this.password);
+    }
+
+    public UserLoginDTO buildUserLoginDTO() {
+        return new UserLoginDTO(this.email, this.password);
     }
 
 }

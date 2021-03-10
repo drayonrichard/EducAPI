@@ -2,7 +2,6 @@ package br.ufpb.dcx.apps4society.educapi.service;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
 import br.ufpb.dcx.apps4society.educapi.domain.builder.UserBuilder;
-import br.ufpb.dcx.apps4society.educapi.domain.builder.UserRegisterDTOBuilder;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserDTO;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
 import br.ufpb.dcx.apps4society.educapi.repositories.UserRepository;
@@ -31,8 +30,8 @@ public class UserServiceTest {
     @InjectMocks
     private UserService service;
 
-    private UserRegisterDTO userRegisterDTO = UserRegisterDTOBuilder.getInstance().build();
-    private Optional<User> userOptional = Optional.ofNullable(UserBuilder.getInstance().build());
+    private UserRegisterDTO userRegisterDTO = UserBuilder.anUser().buildUserRegisterDTO();
+    private Optional<User> userOptional = UserBuilder.anUser().buildOptionalUser();
 
 
     @Test

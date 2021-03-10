@@ -2,13 +2,11 @@ package br.ufpb.dcx.apps4society.educapi.service;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
 import br.ufpb.dcx.apps4society.educapi.domain.builder.UserBuilder;
-import br.ufpb.dcx.apps4society.educapi.domain.builder.UserLoginDTOBuilder;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserLoginDTO;
 import br.ufpb.dcx.apps4society.educapi.repositories.UserRepository;
 import br.ufpb.dcx.apps4society.educapi.response.LoginResponse;
 import br.ufpb.dcx.apps4society.educapi.services.JWTService;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.InvalidUserException;
-import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +22,8 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class JWTServiceTest {
 
-    private final UserLoginDTO userLoginDTO = UserLoginDTOBuilder.getInstance().build();
-    private final Optional<User> userOptional = Optional.ofNullable(UserBuilder.getInstance().build());
+    private final UserLoginDTO userLoginDTO = UserBuilder.anUser().buildUserLoginDTO();
+    private final Optional<User> userOptional = UserBuilder.anUser().buildOptionalUser();
 
     @Mock
     UserRepository userRepository;
