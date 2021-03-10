@@ -1,13 +1,13 @@
-package br.ufpb.dcx.apps4society.educapi.service;
+package br.ufpb.dcx.apps4society.educapi.unit.service;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
-import br.ufpb.dcx.apps4society.educapi.domain.builder.UserBuilder;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserDTO;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
 import br.ufpb.dcx.apps4society.educapi.repositories.UserRepository;
 import br.ufpb.dcx.apps4society.educapi.services.JWTService;
 import br.ufpb.dcx.apps4society.educapi.services.UserService;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.UserAlreadyExistsException;
+import br.ufpb.dcx.apps4society.educapi.unit.domain.builder.UserBuilder;
 import br.ufpb.dcx.apps4society.educapi.util.Messages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -32,8 +33,8 @@ public class UserServiceTest {
     @InjectMocks
     private UserService service;
 
-    private UserRegisterDTO userRegisterDTO = UserBuilder.anUser().buildUserRegisterDTO();
-    private Optional<User> userOptional = UserBuilder.anUser().buildOptionalUser();
+    private final UserRegisterDTO userRegisterDTO = UserBuilder.anUser().buildUserRegisterDTO();
+    private final Optional<User> userOptional = UserBuilder.anUser().buildOptionalUser();
 
 
     @Test
@@ -46,7 +47,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void insertAUserAlreadyExistTest(){
+    public void insertAUserAlreadyExistTest() {
         Mockito.when(this.userRepository.findByEmail(this.userRegisterDTO.getEmail())).thenReturn(this.userOptional);
 
         Exception exception = assertThrows(UserAlreadyExistsException.class, () -> {

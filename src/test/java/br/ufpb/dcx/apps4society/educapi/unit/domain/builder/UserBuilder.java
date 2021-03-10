@@ -1,4 +1,4 @@
-package br.ufpb.dcx.apps4society.educapi.domain.builder;
+package br.ufpb.dcx.apps4society.educapi.unit.domain.builder;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserLoginDTO;
@@ -32,7 +32,7 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder withPassword(String password){
+    public UserBuilder withPassword(String password) {
         this.password = password;
         return this;
     }
