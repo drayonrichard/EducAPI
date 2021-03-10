@@ -8,7 +8,7 @@ import br.ufpb.dcx.apps4society.educapi.repositories.UserRepository;
 import br.ufpb.dcx.apps4society.educapi.services.JWTService;
 import br.ufpb.dcx.apps4society.educapi.services.UserService;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.UserAlreadyExistsException;
-import org.junit.jupiter.api.Assertions;
+import br.ufpb.dcx.apps4society.educapi.util.Messages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +17,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -37,17 +39,20 @@ public class UserServiceTest {
     @Test
     public void insertAUserTest() throws UserAlreadyExistsException {
         UserDTO response = service.insert(this.userRegisterDTO);
-        Assertions.assertNull(response.getId()); // Como não é conectado ao banco de dados, o ID não é gerado
-        Assertions.assertEquals(response.getName(), this.userRegisterDTO.getName());
-        Assertions.assertEquals(response.getEmail(), this.userRegisterDTO.getEmail());
-        Assertions.assertEquals(response.getPassword(), this.userRegisterDTO.getPassword());
+
+        assertEquals(response.getName(), this.userRegisterDTO.getName());
+        assertEquals(response.getEmail(), this.userRegisterDTO.getEmail());
+        assertEquals(response.getPassword(), this.userRegisterDTO.getPassword());
     }
 
     @Test
     public void insertAUserAlreadyExistTest(){
-        Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
-            Mockito.when(this.userRepository.findByEmail(this.userRegisterDTO.getEmail())).thenReturn(this.userOptional);
+        Mockito.when(this.userRepository.findByEmail(this.userRegisterDTO.getEmail())).thenReturn(this.userOptional);
+
+        Exception exception = assertThrows(UserAlreadyExistsException.class, () -> {
             service.insert(this.userRegisterDTO);
-        }, "There is already a user with this e-mail registered in the system!");
+        });
+
+        assertEquals(Messages.USER_ALREADY_EXISTS, exception.getMessage());
     }
 }
