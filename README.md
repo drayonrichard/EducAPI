@@ -43,6 +43,14 @@ Create a `.env` file in the project's root directory, to set the environment var
     POSTGRES_DB=educapi
     DB_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
     TOKEN_KEY=educapi-dev
+    
+ 
+
+> NOTE: Configure the environment variables above according to the PostgreSQL connection created on your machine.
+
+> NOTE: Remember to create a database with the name defined in the value of the POSTGRES_DB variable.
+ 
+
 
 If you are NOT going to run the project using Docker, download the dependencies needed to run the project by right-clicking on the `EducAPI/pom.xml` file.
 
@@ -50,6 +58,7 @@ To run the API locally on your machine, open a terminal at the root of the proje
 
     a4sufpb@a4sufpb:~$ export $(cat .env | xargs)
     a4sufpb@a4sufpb:~$ ./mvnw spring-boot:run
+    
 
 Go to `http://localhost:8080/`to access the API.
 
