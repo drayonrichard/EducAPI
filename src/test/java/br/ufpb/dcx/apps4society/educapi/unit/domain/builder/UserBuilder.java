@@ -100,7 +100,7 @@ public class UserBuilder {
      *
      * @return Optional<User>
      */
-    public Optional<User> buildOptionalUser() { return Optional.ofNullable(new User(this.id, this.name, this.email, this.password)); }
+    public Optional<User> buildOptionalUser() { return Optional.of(new User(this.id, this.name, this.email, this.password)); }
 
     /**
      * Generate an UserRegisterDTO object containing custom or default data
