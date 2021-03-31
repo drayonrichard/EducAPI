@@ -7,6 +7,7 @@ import br.ufpb.dcx.apps4society.educapi.response.LoginResponse;
 import br.ufpb.dcx.apps4society.educapi.services.JWTService;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.InvalidUserException;
 import br.ufpb.dcx.apps4society.educapi.unit.domain.builder.UserBuilder;
+import br.ufpb.dcx.apps4society.educapi.unit.util.FormatTo;
 import br.ufpb.dcx.apps4society.educapi.util.Messages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * This class have only unit tests and util reference to JWTService.
+ * This class have only unit tests related to JWTService.
  *
  * @author Enos Teteo
  */
@@ -37,19 +38,6 @@ public class JWTServiceTest {
     UserRepository userRepository;
     @InjectMocks
     JWTService service;
-
-    /**
-     * Format String to token format adding "Bearer " before the String
-     * Example:
-     *      tokenFormat("any String");
-     *      // return "Bearer any String"
-     *
-     * @param token any String
-     * @return token formatted
-     */
-    private String tokenFormat(String token) {
-        return "Bearer " + token;
-    }
 
     /**
      * Before each test, set value in the field "TOKEN_KEY" in JWTService
@@ -103,7 +91,7 @@ public class JWTServiceTest {
                 .thenReturn(this.userOptional);
 
         LoginResponse response = this.service.authenticate(userLoginDTO);
-        String token = tokenFormat(response.getToken());
+        String token = FormatTo.token(response.getToken());
 
         String userRecovered = this.service.recoverUser(token).get();
 
