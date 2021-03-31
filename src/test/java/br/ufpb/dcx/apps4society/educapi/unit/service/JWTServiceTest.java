@@ -40,9 +40,9 @@ public class JWTServiceTest {
     JWTService service;
 
     /**
-     * Before each test, set value in the field "TOKEN_KEY" in JWTService
+     * Before each test, sets the value of the "TOKEN_KEY" field in JWTService
      *
-     * If don't set the value, the TOKEN_KEY will be null and generate an SignatureException in tests
+     * If this value is not set, the TOKEN_KEY will be null and generate an SignatureException in tests
      */
     @BeforeEach
     public void setUp() {
@@ -50,10 +50,10 @@ public class JWTServiceTest {
     }
 
     /**
-     * Test the function authenticate with user mocked in DB.
+     * Test the authenticate method.
      *
-     * When use an user who has in the DB, the function retun a valid token
-     * @throws InvalidUserException
+     * Verifying if the received token has the correct email
+     * @throws InvalidUserException if the UseLoginDTO is not correctly mocked
      */
     @Test
     public void authenticateTest() throws InvalidUserException {
