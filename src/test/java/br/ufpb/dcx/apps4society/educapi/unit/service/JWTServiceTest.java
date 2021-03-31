@@ -7,8 +7,8 @@ import br.ufpb.dcx.apps4society.educapi.response.LoginResponse;
 import br.ufpb.dcx.apps4society.educapi.services.JWTService;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.InvalidUserException;
 import br.ufpb.dcx.apps4society.educapi.unit.domain.builder.UserBuilder;
-import br.ufpb.dcx.apps4society.educapi.unit.util.FormatTo;
 import br.ufpb.dcx.apps4society.educapi.util.Messages;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +40,28 @@ public class JWTServiceTest {
     JWTService service;
 
     /**
+     * Format String to token format adding "Bearer " before the String
+     * Example:
+     *      FormatTo.token("any String");
+     *      // return "Bearer any String"
+     *
+     * @param token any String
+     * @return token formatted
+     */
+    private String formatToToken(String token) {
+        return "Bearer " + token;
+    }
+
+    /**
+     * Extract the content of the token
+     * @param token any String encrypted using JWTs with value "it's a token key"
+     * @return subject in the token body
+     */
+    private String extractSubjectFromToken(String token) {
+        return Jwts.parser().setSigningKey("it's a token key").parseClaimsJws(token).getBody().getSubject();
+    }
+
+    /**
      * Before each test, sets the value of the "TOKEN_KEY" field in JWTService
      *
      * If this value is not set, the TOKEN_KEY will be null and generate an SignatureException in tests
@@ -57,33 +79,33 @@ public class JWTServiceTest {
      */
     @Test
     public void authenticateTest() throws InvalidUserException {
-        Mockito.when(this.userRepository.findByEmailAndPassword(this.userLoginDTO.getEmail(), this.userLoginDTO.getPassword())).thenReturn(this.userOptional);
+        Mockito.when(this.userRepository.findByEmailAndPassword(this.userLoginDTO.getEmail(), this.userLoginDTO.getPassword()))
+                .thenReturn(this.userOptional);
 
         LoginResponse response = this.service.authenticate(this.userLoginDTO);
+        String subject = extractSubjectFromToken(response.getToken());
 
         assertNotNull(response.getToken());
+        assertEquals(userLoginDTO.getEmail(), subject);
     }
 
-
     /**
-     * Test the function authenticate without user in DB.
+     * Test exception in the authenticate method.
      *
-     * When use an user who hasn't in the DB, the function retun the InvalidUserException
+     * Verifying if an exception is thrown when try to authenticate without configuring an user in DB
      */
     @Test
     public void authenticateUnregisterUserTest() {
-        InvalidUserException invalidUser = assertThrows(InvalidUserException.class, () -> {
+        assertThrows(InvalidUserException.class, () -> {
             this.service.authenticate(this.userLoginDTO);
         });
-
-        assertNotNull(invalidUser);
     }
 
     /**
-     * Test the function recoverUser with a valid token
+     * Test the recoverUser method with a valid token
      *
-     * When use an token valid, the function return an Optional object, who contain the e-mail encrypted in token
-     * @throws InvalidUserException
+     * Verifying if the email returned by recoverUser is equals to the email contained in the token
+     * @throws InvalidUserException if the UserLoginDTO not correctly mocked
      */
     @Test
     public void recoverUserTest() throws InvalidUserException {
@@ -91,31 +113,29 @@ public class JWTServiceTest {
                 .thenReturn(this.userOptional);
 
         LoginResponse response = this.service.authenticate(userLoginDTO);
-        String token = FormatTo.token(response.getToken());
+        String token = formatToToken(response.getToken());
 
         String userRecovered = this.service.recoverUser(token).get();
 
-        assertEquals(userRecovered, this.userLoginDTO.getEmail());
+        assertEquals(this.userLoginDTO.getEmail(), userRecovered);
     }
 
     /**
-     * Test the function recoverUser when pass the param null
+     * Test the recoverUser method with a null token
      *
-     * When use the param null, the function need return an SecurityExpection
+     * Verifying if an exception is thrown when try to recoverUser with a null param
      */
     @Test
     public void revocerUserWithNullTokenTest() {
-        Exception exception = assertThrows(SecurityException.class, () -> {
+        assertThrows(SecurityException.class, () -> {
             this.service.recoverUser(null);
         });
-        assertNotNull(exception);
     }
 
     /**
-     * Test the function recoverUser when pass in the an expired token
+     * Test the recoverUser method with an expired token
      *
-     * When set an token expired, the function need return an SecurityExpection, with message informing who the token
-     * is invalid or expired
+     * Verifying if an exception is thrown and have the correctly message when try to recoverUser with an expired token
      */
     @Test
     public void revocerUserWithExpiredTokenTest() {
