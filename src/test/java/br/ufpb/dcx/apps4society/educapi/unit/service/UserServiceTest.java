@@ -6,9 +6,11 @@ import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
 import br.ufpb.dcx.apps4society.educapi.repositories.UserRepository;
 import br.ufpb.dcx.apps4society.educapi.services.JWTService;
 import br.ufpb.dcx.apps4society.educapi.services.UserService;
+import br.ufpb.dcx.apps4society.educapi.services.exceptions.InvalidUserException;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.UserAlreadyExistsException;
 import br.ufpb.dcx.apps4society.educapi.unit.domain.builder.UserBuilder;
 import br.ufpb.dcx.apps4society.educapi.util.Messages;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +23,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * This class have only unit tests reference to UserService
+ *
+ * @author Enos Tetéo
+ */
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
@@ -35,8 +42,15 @@ public class UserServiceTest {
 
     private final UserRegisterDTO userRegisterDTO = UserBuilder.anUser().buildUserRegisterDTO();
     private final Optional<User> userOptional = UserBuilder.anUser().buildOptionalUser();
+    private final User user = UserBuilder.anUser().buildUser();
 
 
+    /**
+     * Test the insert method
+     *
+     * Verifying if when insert an UserRegisterDTO, the response has contain the data the UserRegisterDTO
+     * @throws UserAlreadyExistsException if have an UserRegisterDTO mocked with the equals emails
+     */
     @Test
     public void insertAUserTest() throws UserAlreadyExistsException {
         UserDTO response = service.insert(this.userRegisterDTO);
@@ -46,6 +60,11 @@ public class UserServiceTest {
         assertEquals(response.getPassword(), this.userRegisterDTO.getPassword());
     }
 
+    /**
+     * Test the insert method with already email registered
+     *
+     * Verifying if when insert an UserRegisterDTO with email registered in the system, the response is UserAlreadyExistsException
+     */
     @Test
     public void insertAUserAlreadyExistTest() {
         Mockito.when(this.userRepository.findByEmail(this.userRegisterDTO.getEmail())).thenReturn(this.userOptional);
@@ -56,4 +75,41 @@ public class UserServiceTest {
 
         assertEquals(Messages.USER_ALREADY_EXISTS, exception.getMessage());
     }
+
+
+    /**
+     * Test the find method
+     *
+     * Verifying if when find an User using your user token, the response is User
+     * @throws InvalidUserException if have not an UserDTO mocked with the email used in the test
+     */
+    @Test
+    public void findAUserTest() throws InvalidUserException{
+        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
+
+        User response = service.find("token valid");
+
+        assertEquals(userOptional.get().getEmail(), response.getEmail());
+        assertEquals(userOptional.get().getName(), response.getName());
+        assertEquals(userOptional.get().getPassword(), response.getPassword());
+    }
+
+    /**
+     * Test the find method with a null token
+     *
+     * Verifying if when use a find method with a null token, the response is
+     */
+    @Test
+    public void findAInvalidUserTest() {
+        Exception exception = assertThrows(InvalidUserException.class, () -> {
+           service.find(null);
+        });
+        assertEquals(Messages.INVALID_USER_CHECK_THE_TOKEN, exception.getMessage());
+    }
+
+    /**
+     * Test the function find with a user that don't is registered in system"Invalid user! Please check the token."
+     * isn't empty, is valid, but isn't registered in the system (or it was but was deleted)
+     */
 }
