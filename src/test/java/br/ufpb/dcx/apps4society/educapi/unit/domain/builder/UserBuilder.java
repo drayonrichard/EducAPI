@@ -133,4 +133,7 @@ public class UserBuilder {
     public UserLoginDTO buildUserLoginDTO() {
         return new UserLoginDTO(this.email, this.password);
     }
+
+    public User buildUser() { return new User(this.id, this.name, this.email, this.password);
+    }
 }
