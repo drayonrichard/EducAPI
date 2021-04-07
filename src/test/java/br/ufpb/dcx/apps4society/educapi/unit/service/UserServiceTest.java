@@ -98,7 +98,7 @@ public class UserServiceTest {
     /**
      * Test the find method with a null token
      *
-     * Verifying if when use a find method with a null token, the response is
+     * Verifying if when use a find method with a null token, the response is InvalidUserException
      */
     @Test
     public void findAInvalidUserTest() {
@@ -109,7 +109,17 @@ public class UserServiceTest {
     }
 
     /**
-     * Test the function find with a user that don't is registered in system"Invalid user! Please check the token."
+     * Test the find method with a user that is not registered in system
+     * TODO: NEED REFACTORY THE DOC
+     * Verifying if when use a find method with a token with email not registered in the system, the response is Exception!!
      * isn't empty, is valid, but isn't registered in the system (or it was but was deleted)
      */
+    @Test
+    public void findANotRegisteredUserTest() {
+        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+
+        assertThrows(InvalidUserException.class, () -> {
+            User response = service.find("token valid");
+        });
+    }
 }
