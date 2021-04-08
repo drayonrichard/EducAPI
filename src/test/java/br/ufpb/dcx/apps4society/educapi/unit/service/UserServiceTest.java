@@ -10,7 +10,6 @@ import br.ufpb.dcx.apps4society.educapi.services.exceptions.InvalidUserException
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.UserAlreadyExistsException;
 import br.ufpb.dcx.apps4society.educapi.unit.domain.builder.UserBuilder;
 import br.ufpb.dcx.apps4society.educapi.util.Messages;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,8 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This class have only unit tests reference to UserService
@@ -31,24 +29,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private JWTService jwtService;
-
-    @InjectMocks
-    private UserService service;
-
     private final UserRegisterDTO userRegisterDTO = UserBuilder.anUser().buildUserRegisterDTO();
     private final Optional<User> userOptional = UserBuilder.anUser().buildOptionalUser();
-    private final User user = UserBuilder.anUser().buildUser();
 
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private JWTService jwtService;
+    @InjectMocks
+    private UserService service;
 
     /**
      * Test the insert method
      *
      * Verifying if when insert an UserRegisterDTO, the response has contain the data the UserRegisterDTO
+     *
      * @throws UserAlreadyExistsException if have an UserRegisterDTO mocked with the equals emails
      */
     @Test
@@ -81,10 +76,11 @@ public class UserServiceTest {
      * Test the find method
      *
      * Verifying if when find an User using your user token, the response is User
+     *
      * @throws InvalidUserException if have not an UserDTO mocked with the email used in the test
      */
     @Test
-    public void findAUserTest() throws InvalidUserException{
+    public void findAUserTest() throws InvalidUserException {
         Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
         Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
 
@@ -103,23 +99,74 @@ public class UserServiceTest {
     @Test
     public void findAInvalidUserTest() {
         Exception exception = assertThrows(InvalidUserException.class, () -> {
-           service.find(null);
+            service.find(null);
         });
         assertEquals(Messages.INVALID_USER_CHECK_THE_TOKEN, exception.getMessage());
     }
 
     /**
      * Test the find method with a user that is not registered in system
-     * TODO: NEED REFACTORY THE DOC
-     * Verifying if when use a find method with a token with email not registered in the system, the response is Exception!!
-     * isn't empty, is valid, but isn't registered in the system (or it was but was deleted)
+     *
+     * Verifying if when use a find method with a token valid and email not registered in the system, the response is Exception
      */
     @Test
-    public void findANotRegisteredUserTest() {
+    public void findANotRegisteredUserTest() throws InvalidUserException {
         Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
 
         assertThrows(InvalidUserException.class, () -> {
             User response = service.find("token valid");
         });
     }
+
+    /**
+     * Test the update method
+     *
+     * Verifying if when update an User, the response has contain the UserDTO edited
+     *
+     * @throws InvalidUserException if have not mocked the find method
+     */
+    @Test
+    public void updateAUserTest() throws InvalidUserException {
+        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
+
+        userRegisterDTO.setName("testUpdate");
+        userRegisterDTO.setEmail("testUpdate@mail.com");
+        userRegisterDTO.setPassword("testPass");
+
+        assertNotEquals(userOptional.get().getName(), userRegisterDTO.getName());
+        assertNotEquals(userOptional.get().getEmail(), userRegisterDTO.getEmail());
+        assertNotEquals(userOptional.get().getPassword(), userRegisterDTO.getPassword());
+
+        UserDTO response = service.update("token valid", userRegisterDTO);
+
+
+        assertEquals("testUpdate", response.getName());
+        assertEquals("testUpdate@mail.com", response.getEmail());
+        assertEquals("testPass", response.getPassword());
+
+        assertEquals(userOptional.get().getId(), response.getId());
+    }
+
+    /**
+     * Test the delete method
+     *
+     * Verifying if when delete an User, the response has contain the UserDTO deleted
+     *
+     * @throws InvalidUserException
+     */
+    @Test
+    public void deleteAUserTest() throws InvalidUserException {
+        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
+
+        UserDTO response = service.delete("token valid");
+
+        assertEquals(userOptional.get().getName(), response.getName());
+        assertEquals(userOptional.get().getEmail(), response.getEmail());
+        assertEquals(userOptional.get().getPassword(), response.getPassword());
+        assertEquals(userOptional.get().getId(), response.getId());
+
+    }
+
 }
