@@ -41,7 +41,7 @@ public class JWTService {
                 .setExpiration(new Date(System.currentTimeMillis() + 30 * 60 * 1000)).compact();
     }
 
-    public Optional<String> recoverUser(String header){
+    public Optional<String> recoverUserEmailByToken(String header){
         if (header == null || !header.startsWith("Bearer ")){
             throw new SecurityException();
         }

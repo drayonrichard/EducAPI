@@ -33,7 +33,7 @@ public class ChallengeService {
     private ContextRepository contextRepository;
 
     public Challenge find(String token, Long id) throws ObjectNotFoundException, InvalidUserException {
-        Optional<String> usuarioId = jwtService.recoverUser(token);
+        Optional<String> usuarioId = jwtService.recoverUserEmailByToken(token);
         if (usuarioId.isEmpty()) {
             throw new InvalidUserException();
         }
@@ -103,7 +103,7 @@ public class ChallengeService {
     }
 
     private User validateUser(String token) throws ObjectNotFoundException, InvalidUserException {
-        Optional<String> userEmail = jwtService.recoverUser(token);
+        Optional<String> userEmail = jwtService.recoverUserEmailByToken(token);
         if (userEmail.isEmpty()) {
             throw new InvalidUserException();
         }

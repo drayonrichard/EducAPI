@@ -81,7 +81,7 @@ public class UserServiceTest {
      */
     @Test
     public void findAUserTest() throws InvalidUserException {
-        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(jwtService.recoverUserEmailByToken("token valid")).thenReturn(Optional.of("teste@teste.com"));
         Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
 
         User response = service.find("token valid");
@@ -111,11 +111,12 @@ public class UserServiceTest {
      */
     @Test
     public void findANotRegisteredUserTest() throws InvalidUserException {
-        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(jwtService.recoverUserEmailByToken("token valid")).thenReturn(Optional.of("teste@teste.com"));
 
-        assertThrows(InvalidUserException.class, () -> {
+        Exception exception = assertThrows(InvalidUserException.class, () -> {
             User response = service.find("token valid");
         });
+        assertEquals(Messages.INVALID_USER_CHECK_THE_EMAIL, exception.getMessage());
     }
 
     /**
@@ -127,7 +128,7 @@ public class UserServiceTest {
      */
     @Test
     public void updateAUserTest() throws InvalidUserException {
-        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(jwtService.recoverUserEmailByToken("token valid")).thenReturn(Optional.of("teste@teste.com"));
         Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
 
         userRegisterDTO.setName("testUpdate");
@@ -157,7 +158,7 @@ public class UserServiceTest {
      */
     @Test
     public void deleteAUserTest() throws InvalidUserException {
-        Mockito.when(jwtService.recoverUser("token valid")).thenReturn(Optional.of("teste@teste.com"));
+        Mockito.when(jwtService.recoverUserEmailByToken("token valid")).thenReturn(Optional.of("teste@teste.com"));
         Mockito.when(userRepository.findByEmail("teste@teste.com")).thenReturn(userOptional);
 
         UserDTO response = service.delete("token valid");

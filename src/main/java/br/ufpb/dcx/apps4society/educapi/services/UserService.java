@@ -1,11 +1,13 @@
 package br.ufpb.dcx.apps4society.educapi.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.InvalidUserException;
 import br.ufpb.dcx.apps4society.educapi.services.exceptions.UserAlreadyExistsException;
+import br.ufpb.dcx.apps4society.educapi.util.Messages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,15 +28,22 @@ public class UserService {
 	private UserRepository userRepository;
 
 	public User find(String token) throws InvalidUserException {
-		Optional<String> userEmail = jwtService.recoverUser(token);
+		Optional<String> optionalUserEmail = jwtService.recoverUserEmailByToken(token);
 
-		if (userEmail.isEmpty()){
+		if (optionalUserEmail.isEmpty()){
 			throw new InvalidUserException("Invalid user! Please check the token.");
 		}
 
-		Optional<User> obgOptional = userRepository.findByEmail(userEmail.get());
-		return obgOptional.get();
+		String userEmail = optionalUserEmail.get();
+
+		try {
+			Optional<User> userOptional = userRepository.findByEmail(userEmail);
+			return userOptional.get();
+		} catch (NoSuchElementException error) {
+			throw new InvalidUserException(Messages.INVALID_USER_CHECK_THE_EMAIL);
+		}
 	}
+
 
 	public UserDTO insert(UserRegisterDTO userDTO) throws UserAlreadyExistsException {
 		Optional<User> userOptional = userRepository.findByEmail(userDTO.getEmail());
