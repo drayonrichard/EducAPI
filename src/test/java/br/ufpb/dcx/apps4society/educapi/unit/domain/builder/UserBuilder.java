@@ -1,6 +1,7 @@
 package br.ufpb.dcx.apps4society.educapi.unit.domain.builder;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
+import br.ufpb.dcx.apps4society.educapi.dto.user.UserDTO;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserLoginDTO;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
 
@@ -136,4 +137,19 @@ public class UserBuilder {
 
     public User buildUser() { return new User(this.id, this.name, this.email, this.password);
     }
+
+    /**
+     * Generate an UserDTO object containint custom or default data
+     *
+     * Example 1:
+     *      UserBuilder.anUser().buildUserDTO();
+     *      This returns an UserDTO with default data
+     *
+     * Example 2:
+     *      UserBuilder.anUser().withName("User DTO").buildUserDTO();
+     *      This returns an UserDTO with all data default, but with name "User DTO"
+     *
+     * @return UserDTO
+     */
+    public UserDTO buildUserDTO() { return new UserDTO(buildUser()); }
 }
