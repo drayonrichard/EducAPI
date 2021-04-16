@@ -75,6 +75,7 @@ public class UserResourceTest {
                 .header("Authorization", "token"))
                 .andExpect(status().isForbidden());
     }
+
     /**
      * Test the insert method
      *
@@ -85,12 +86,26 @@ public class UserResourceTest {
      */
     @Test
     public void insertAnUserTest() throws Exception {
-        String json = objectMapper.writeValueAsString(userRegisterDTO);
-
         Mockito.when(service.insert(any(UserRegisterDTO.class))).thenReturn(userDTO);
 
         mockMvc.perform(post(uriBase + "/users").contentType("application/json")
-                .content(json)).andExpect(status().isCreated())
+                .content(objectMapper.writeValueAsString(userRegisterDTO))).andExpect(status().isCreated())
                 .andExpect(content().string(objectMapper.writeValueAsString(userDTO))).andReturn();
+    }
+
+    /**
+     * Test the insert method with UserAlreadyExistsException
+     *
+     * Verifying if when insert an json with an UserRegisterDTO that already exist in the system,
+     * the response is not content
+     *
+     * @throws Exception if have not an user mocked
+     */
+    @Test
+    public void insertAnUserAlreadyExistTest() throws Exception {
+        Mockito.when(service.insert(any(UserRegisterDTO.class))).thenThrow(new UserAlreadyExistsException(Messages.USER_ALREADY_EXISTS));
+
+        mockMvc.perform(post(uriBase + "/users").contentType("application/json")
+                .content(objectMapper.writeValueAsString(userRegisterDTO))).andExpect(status().isNoContent());
     }
 }
