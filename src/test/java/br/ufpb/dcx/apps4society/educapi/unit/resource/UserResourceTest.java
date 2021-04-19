@@ -20,8 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,7 +54,7 @@ public class UserResourceTest {
     public void findAnUserTest() throws Exception {
         Mockito.when(service.find("token")).thenReturn(user);
 
-        mockMvc.perform(get(uriBase + "/auth/users")
+        mockMvc.perform(get(uriBase + "/auth/users").characterEncoding("UTF-8")
                 .header("Authorization", "token"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(objectMapper.writeValueAsString(user)));
@@ -65,13 +64,13 @@ public class UserResourceTest {
      * Test the find method with a token that return an InvalidUserException
      *
      * Verifying if when use a find method with an invalid token, the response is forbidden
-     * @throws Exception if have not an method find in UserService mocked
+     * @throws Exception if have not an find method in UserService mocked
      */
     @Test
     public void findAInvalidUserTest() throws Exception {
         Mockito.when(service.find("token")).thenThrow(new InvalidUserException(Messages.INVALID_USER_CHECK_THE_TOKEN));
 
-        mockMvc.perform(get(uriBase + "/auth/users")
+        mockMvc.perform(get(uriBase + "/auth/users").characterEncoding("UTF-8")
                 .header("Authorization", "token"))
                 .andExpect(status().isForbidden());
     }
@@ -82,15 +81,15 @@ public class UserResourceTest {
      * Verifying if when insert an json with an UserRegisterDTO,
      * the response has contain an json with the data the UserRegisterDTO
      *
-     * @throws Exception if have not an method find in UserService mocked
+     * @throws Exception if have not an find method in UserService mocked
      */
     @Test
     public void insertAnUserTest() throws Exception {
         Mockito.when(service.insert(any(UserRegisterDTO.class))).thenReturn(userDTO);
 
-        mockMvc.perform(post(uriBase + "/users").contentType("application/json")
+        mockMvc.perform(post(uriBase + "/users").contentType("application/json").characterEncoding("UTF-8")
                 .content(objectMapper.writeValueAsString(userRegisterDTO))).andExpect(status().isCreated())
-                .andExpect(content().string(objectMapper.writeValueAsString(userDTO))).andReturn();
+                .andExpect(content().string(objectMapper.writeValueAsString(userDTO)));
     }
 
     /**
@@ -105,7 +104,79 @@ public class UserResourceTest {
     public void insertAnUserAlreadyExistTest() throws Exception {
         Mockito.when(service.insert(any(UserRegisterDTO.class))).thenThrow(new UserAlreadyExistsException(Messages.USER_ALREADY_EXISTS));
 
-        mockMvc.perform(post(uriBase + "/users").contentType("application/json")
+        mockMvc.perform(post(uriBase + "/users").contentType("application/json").characterEncoding("UTF-8")
                 .content(objectMapper.writeValueAsString(userRegisterDTO))).andExpect(status().isNoContent());
+    }
+
+    /**
+     * Test the update method
+     *
+     * Verifying if when update an json with an UserRegisterDTO and passing an token in the Autorization,
+     * the response has contain an json with the UserDTO edited
+     *
+     * @throws Exception if have not mocked the update method in UserService
+     */
+    @Test
+    public void updateAnUserTest() throws Exception {
+        Mockito.when(service.update(any(), any(UserRegisterDTO.class))).thenReturn(userDTO);
+
+        mockMvc.perform(put(uriBase + "/auth/users").contentType("application/json").characterEncoding("UTF-8")
+                .header("Authorization", "token")
+                .content(objectMapper.writeValueAsString(userRegisterDTO)))
+                .andExpect(status().isOk()).andExpect(content()
+                .string(objectMapper.writeValueAsString(userDTO)));
+    }
+
+    /**
+     * Test the update method with a token that return an InvalidUserException
+     *
+     * Verifying if when update an json with an UserRegisterDTO and passing an invalid token in the Autorization,
+     * the response has contain the status code is forbidden
+     *
+     * @throws Exception if have not mocked the update method in UserService
+     */
+    @Test
+    public void updateAnUserWithInvalidTokenTest() throws Exception {
+        Mockito.when(service.update(any(), any(UserRegisterDTO.class))).thenThrow(new InvalidUserException(Messages.INVALID_USER_CHECK_THE_TOKEN));
+
+        mockMvc.perform(put(uriBase + "/auth/users").contentType("application/json").characterEncoding("UTF-8")
+                .header("Authorization", "token")
+                .content(objectMapper.writeValueAsString(userRegisterDTO)))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Test the delete method
+     *
+     * Verifying if when delete an User parsing an Authorization with the token,
+     * the response has contain the UserDTO deleted
+     *
+     * @throws Exception if have not mocked the delete method in UserService
+     */
+    @Test
+    public void deleteAnUserTest() throws Exception {
+        Mockito.when(service.delete("token")).thenReturn(userDTO);
+
+        mockMvc.perform(delete(uriBase + "/auth/users").characterEncoding("UTF-8")
+                .header("Authorization", "token"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(userDTO)));
+    }
+
+    /**
+     * Test the delete method
+     *
+     * Verifying if when delete an User parsing an Authorization with the token invalid,
+     * the response has contain the InvalidUserException
+     *
+     * @throws Exception if have not mocked the delete method in UserService
+     */
+    @Test
+    public void deleteAnUserWithinvalidTokenTest() throws Exception {
+        Mockito.when(service.delete("token")).thenThrow(new InvalidUserException(Messages.INVALID_USER_CHECK_THE_TOKEN));
+
+        mockMvc.perform(delete(uriBase + "/auth/users").characterEncoding("UTF-8")
+                .header("Authorization", "token"))
+                .andExpect(status().isForbidden());
     }
 }
