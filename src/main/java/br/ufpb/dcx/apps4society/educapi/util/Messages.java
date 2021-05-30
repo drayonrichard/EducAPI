@@ -10,4 +10,6 @@ package br.ufpb.dcx.apps4society.educapi.util;
 public class Messages {
     public static final String USER_ALREADY_EXISTS = "There is already a user with this e-mail registered in the system!";
     public static final String TOKEN_INVALID_OR_EXPIRED = "Token invalid or expired!";
+    public static final String INVALID_USER_CHECK_THE_TOKEN = "Invalid user! Please check the token.";
+    public static final String INVALID_USER_CHECK_THE_EMAIL = "Invalid user! Please check the email";
 }

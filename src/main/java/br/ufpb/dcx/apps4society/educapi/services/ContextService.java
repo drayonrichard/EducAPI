@@ -103,7 +103,7 @@ public class ContextService {
     }
 
     private User validateUser(String token) throws ObjectNotFoundException, InvalidUserException {
-        Optional<String> userEmail = jwtService.recoverUser(token);
+        Optional<String> userEmail = jwtService.recoverUserEmailByToken(token);
         if (userEmail.isEmpty()) {
             throw new InvalidUserException();
         }

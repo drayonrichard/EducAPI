@@ -115,7 +115,7 @@ public class JWTServiceTest {
         LoginResponse response = this.service.authenticate(userLoginDTO);
         String token = formatToToken(response.getToken());
 
-        String userRecovered = this.service.recoverUser(token).get();
+        String userRecovered = this.service.recoverUserEmailByToken(token).get();
 
         assertEquals(this.userLoginDTO.getEmail(), userRecovered);
     }
@@ -128,7 +128,7 @@ public class JWTServiceTest {
     @Test
     public void revocerUserWithNullTokenTest() {
         assertThrows(SecurityException.class, () -> {
-            this.service.recoverUser(null);
+            this.service.recoverUserEmailByToken(null);
         });
     }
 
@@ -140,7 +140,7 @@ public class JWTServiceTest {
     @Test
     public void revocerUserWithExpiredTokenTest() {
         Exception exception = assertThrows(SecurityException.class, () -> {
-            this.service.recoverUser(invalidToken);
+            this.service.recoverUserEmailByToken(invalidToken);
         });
         assertEquals(Messages.TOKEN_INVALID_OR_EXPIRED, exception.getMessage());
     }

@@ -1,23 +1,24 @@
 package br.ufpb.dcx.apps4society.educapi.unit.domain.builder;
 
 import br.ufpb.dcx.apps4society.educapi.domain.User;
+import br.ufpb.dcx.apps4society.educapi.dto.user.UserDTO;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserLoginDTO;
 import br.ufpb.dcx.apps4society.educapi.dto.user.UserRegisterDTO;
 
 import java.util.Optional;
 
 /**
- * Create an object that can be UserBuilder, UserRegisterDTO, UserLoginDTO or OptionalUser
- * Can create an object with custom or default data
- * This class used an adaptation of pattern Test Data Builder and pattern Builder
+ * Create instances of UserBuilder, UserRegisterDTO, UserLoginDTO or OptionalUser classes
+ * Can create an instances with custom or default data
+ * This class used an adaptation of Test Data Builder pattern and Builder pattern
  *
  * Example 1:
  *      UserLoginDTO userLoginDTO = UserBuilder.anUser().buildUserLoginDTO();
- *      // UserLoginDTO with email = "user@educapi.com" and password = "testpassword";
+ *      This returns UserLoginDTO with email = "user@educapi.com" and password = "testpassword";
  *
  * Example 2:
  *      UserLoginDTO userLoginDTO = UserBuilder.anUser().withEmail("foo@bar.com").buildUserLoginDTO();
- *      // UserLoginDTO with email = "foo@bar.com" and password = "testpassword";
+ *      This returns UserLoginDTO with email = "foo@bar.com" and password = "testpassword";
  *
  * @author Enos Teteo
  */
@@ -29,8 +30,8 @@ public class UserBuilder {
     private String password = "testpassword";
 
     /**
-     * Init a new User Builder with default values that can personalized with others methods
-     * Is similar to getInstance in the pattern Builder
+     * Init a new UserBuilder with default values that can personalized with others methods
+     * Is similar to getInstance in the Builder pattern
      *
      * Note: id by default is null but you can change it using the function .withId("put your id").
      * @return a new User Builder
@@ -92,25 +93,25 @@ public class UserBuilder {
      * Generate an Optional object containing an User using custom or default data
      * Example 1:
      *      UserBuilder.anUser().buildOptionalUser();
-     *      // return an Optional User with default data
+     *      This returns an Optional<User> with default data
      *
      * Example 2:
      *      UserBuilder.anUser().withName("Optional User").buildOptionalUser();
-     *      // return an Optional User with all data default, but with name "Optional User"
+     *      This returns an Optional<User> with all data default, but with name "Optional User"
      *
      * @return Optional<User>
      */
-    public Optional<User> buildOptionalUser() { return Optional.ofNullable(new User(this.id, this.name, this.email, this.password)); }
+    public Optional<User> buildOptionalUser() { return Optional.of(new User(this.id, this.name, this.email, this.password)); }
 
     /**
      * Generate an UserRegisterDTO object containing custom or default data
      * Example 1:
      *      UserBuilder.anUser().buildUserRegisterDTO();
-     *      // return an UserRegisterDTO with default data
+     *      This returns an UserRegisterDTO with default data
      *
      * Example 2:
      *      UserBuilder.anUser().withName("User Register DTO").buildUserRegisterDTO();
-     *      // return an UserRegisterDTO with all data default, but with name "User Register DTO"
+     *      This returns an UserRegisterDTO with all data default, but with name "User Register DTO"
      *
      * @return UserRegisterDTO
      */
@@ -122,15 +123,33 @@ public class UserBuilder {
      * Generate an UserLoginDTO object containing custom or default data
      * Example 1:
      *      UserBuilder.anUser().buildUserLoginDTO();
-     *      // return an UserLoginDTO with default data
+     *      This returns an UserLoginDTO with default data
      *
      * Example 2:
      *      UserBuilder.anUser().withName("User Login DTO").buildUserLoginDTO();
-     *      // return an UserLoginDTO with all data default, but with name "User Login DTO"
+     *      This returns an UserLoginDTO with all data default, but with name "User Login DTO"
      *
-     * @return UserRegisterDTO
+     * @return UserLoginDTO
      */
     public UserLoginDTO buildUserLoginDTO() {
         return new UserLoginDTO(this.email, this.password);
     }
+
+    public User buildUser() { return new User(this.id, this.name, this.email, this.password);
+    }
+
+    /**
+     * Generate an UserDTO object containint custom or default data
+     *
+     * Example 1:
+     *      UserBuilder.anUser().buildUserDTO();
+     *      This returns an UserDTO with default data
+     *
+     * Example 2:
+     *      UserBuilder.anUser().withName("User DTO").buildUserDTO();
+     *      This returns an UserDTO with all data default, but with name "User DTO"
+     *
+     * @return UserDTO
+     */
+    public UserDTO buildUserDTO() { return new UserDTO(buildUser()); }
 }
