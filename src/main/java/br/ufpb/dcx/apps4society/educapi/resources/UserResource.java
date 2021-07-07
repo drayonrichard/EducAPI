@@ -17,7 +17,6 @@ import br.ufpb.dcx.apps4society.educapi.services.UserService;
 
 @RestController
 @RequestMapping(value="/v1/api/")
-@CrossOrigin("*")
 public class UserResource {
 	@Autowired
 	private UserService userService;
